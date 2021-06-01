@@ -1,6 +1,8 @@
 package ru.vsu.cs.course1.graph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -112,5 +114,44 @@ public class AdjMatrixGraph implements Graph {
     @Override
     public boolean isAdj(int v1, int v2) {
         return adjMatrix[v1][v2];
+    }
+
+    public void makeMaxChain() {
+        ArrayList<Integer> maxChain = new ArrayList<>();
+        ArrayList<Integer> curMaxChain = new ArrayList<>();
+        ArrayList<Integer> curChain = new ArrayList<>();
+        for (int i = 0; i < vCount; i++) {
+            curChain.clear();
+            curChain.add(i);
+            curMaxChain = findMaxChain(adjMatrix, curChain, maxChain);
+            if (curMaxChain.size() > maxChain.size()) {
+                maxChain = curMaxChain;
+            }
+        }
+
+        adjMatrix = new boolean[Collections.max(maxChain) + 1][Collections.max(maxChain) + 1];
+        vCount = Collections.max(maxChain) + 1;
+        eCount = 0;
+
+        for (int i = 0; i < maxChain.size() - 1; i++) {
+            addAdge(maxChain.get(i), maxChain.get(i + 1));
+        }
+    }
+
+    private ArrayList<Integer> findMaxChain(boolean[][] matrix,
+                                            ArrayList<Integer> curChain,
+                                            ArrayList<Integer> maxChain) {
+        int index = curChain.get(curChain.size() - 1);
+        for (int i = 0; i < vCount; i++) {
+            if (matrix[index][i] && (!curChain.contains(i))) {
+                curChain.add(i);
+                maxChain = findMaxChain(matrix, curChain, maxChain);
+                curChain.remove(curChain.size() - 1);
+            }
+        }
+        if (curChain.size() > maxChain.size()) {
+            maxChain = new ArrayList<>(curChain);
+        }
+        return maxChain;
     }
 }

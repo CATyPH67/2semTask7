@@ -12,6 +12,7 @@ import org.apache.batik.bridge.*;
 import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
+import ru.vsu.cs.course1.graph.AdjMatrixGraph;
 import ru.vsu.cs.course1.graph.Graph;
 import ru.vsu.cs.course1.graph.GraphAlgorithms;
 import ru.vsu.cs.course1.graph.GraphUtils;
@@ -22,6 +23,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -62,6 +65,7 @@ public class GraphDemoFrame extends JFrame {
     private JButton buttonSaveDotSvgToFile;
     private JComboBox comboBoxExample;
     private JButton buttonExampleExec;
+    private JButton creatingChainButton;
 
     private JFileChooser fileChooserTxtOpen;
     private JFileChooser fileChooserDotOpen;
@@ -371,6 +375,26 @@ public class GraphDemoFrame extends JFrame {
                 }
                 try (FileWriter wr = new FileWriter(filename)) {
                     wr.write(panelGraphvizPainter.svg);
+                } catch (Exception exc) {
+                    SwingUtils.showErrorMessageBox(exc);
+                }
+            }
+        });
+        creatingChainButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    AdjMatrixGraph graph = new AdjMatrixGraph(GraphDemoFrame.this.graph.vertexCount());
+                    for (int i = 0; i < graph.vertexCount(); i++) {
+                        for (int j = 0; j < graph.vertexCount(); j++) {
+                            if (GraphDemoFrame.this.graph.isAdj(i, j)) {
+                                graph.addAdge(i, j);
+                            }
+                        }
+                    }
+                    graph.makeMaxChain();
+                    GraphDemoFrame.this.graph = graph;
+                    panelGraphPainter.paint(dotToSvg(GraphUtils.toDot(GraphDemoFrame.this.graph)));
                 } catch (Exception exc) {
                     SwingUtils.showErrorMessageBox(exc);
                 }
