@@ -123,7 +123,7 @@ public class AdjMatrixGraph implements Graph {
         for (int i = 0; i < vCount; i++) {
             curChain.clear();
             curChain.add(i);
-            curMaxChain = findMaxChain(adjMatrix, curChain, maxChain);
+            curMaxChain = findMaxChain(curChain, maxChain);
             if (curMaxChain.size() > maxChain.size()) {
                 maxChain = curMaxChain;
             }
@@ -138,14 +138,12 @@ public class AdjMatrixGraph implements Graph {
         }
     }
 
-    private ArrayList<Integer> findMaxChain(boolean[][] matrix,
-                                            ArrayList<Integer> curChain,
-                                            ArrayList<Integer> maxChain) {
+    private ArrayList<Integer> findMaxChain(ArrayList<Integer> curChain, ArrayList<Integer> maxChain) {
         int index = curChain.get(curChain.size() - 1);
         for (int i = 0; i < vCount; i++) {
-            if (matrix[index][i] && (!curChain.contains(i))) {
+            if (adjMatrix[index][i] && (!curChain.contains(i))) {
                 curChain.add(i);
-                maxChain = findMaxChain(matrix, curChain, maxChain);
+                maxChain = findMaxChain(curChain, maxChain);
                 curChain.remove(curChain.size() - 1);
             }
         }
